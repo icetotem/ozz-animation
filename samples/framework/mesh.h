@@ -127,6 +127,15 @@ struct Mesh {
   typedef ozz::vector<uint16_t> TriangleIndices;
   TriangleIndices triangle_indices;
 
+  // ++MaterialSlot
+  struct MaterialSlot {
+    int id;
+    uint32_t start_index;
+    uint32_t num_indices;
+  };
+  typedef ozz::vector<MaterialSlot> Materials;
+  Materials materials;
+
   // Joints remapping indices. As a skin might be influenced by a part of the
   // skeleton only, joint indices and inverse bind pose matrices are reordered
   // to contain only used ones. Note that this array is sorted.
@@ -149,6 +158,16 @@ struct Extern<sample::Mesh::Part> {
   static void Save(OArchive& _archive, const sample::Mesh::Part* _parts,
                    size_t _count);
   static void Load(IArchive& _archive, sample::Mesh::Part* _parts,
+                   size_t _count, uint32_t _version);
+};
+
+OZZ_IO_TYPE_TAG("ozz-sample-Mesh-MaterialSlot", sample::Mesh::MaterialSlot)
+OZZ_IO_TYPE_VERSION(1, sample::Mesh::MaterialSlot)
+template <>
+struct Extern<sample::Mesh::MaterialSlot> {
+  static void Save(OArchive& _archive, const sample::Mesh::MaterialSlot* _slots,
+                   size_t _count);
+  static void Load(IArchive& _archive, sample::Mesh::MaterialSlot* _slots,
                    size_t _count, uint32_t _version);
 };
 

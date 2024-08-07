@@ -69,6 +69,29 @@ void Extern<sample::Mesh::Part>::Load(IArchive& _archive,
   }
 }
 
+void Extern<sample::Mesh::MaterialSlot>::Save(OArchive& _archive,
+                                              const sample::Mesh::MaterialSlot* _slots,
+                                              size_t _count) {
+  for (size_t i = 0; i < _count; ++i) {
+    const sample::Mesh::MaterialSlot& slot = _slots[i];
+    _archive << slot.id;
+    _archive << slot.start_index;
+    _archive << slot.num_indices;
+  }
+}
+
+void Extern<sample::Mesh::MaterialSlot>::Load(IArchive& _archive,
+                                              sample::Mesh::MaterialSlot* _slots,
+                                              size_t _count, uint32_t _version) {
+  (void)_version;
+  for (size_t i = 0; i < _count; ++i) {
+    sample::Mesh::MaterialSlot& slot = _slots[i];
+    _archive >> slot.id;
+    _archive >> slot.start_index;
+    _archive >> slot.num_indices;
+  }
+}
+
 void Extern<sample::Mesh>::Save(OArchive& _archive, const sample::Mesh* _meshes,
                                 size_t _count) {
   for (size_t i = 0; i < _count; ++i) {
@@ -77,6 +100,7 @@ void Extern<sample::Mesh>::Save(OArchive& _archive, const sample::Mesh* _meshes,
     _archive << mesh.triangle_indices;
     _archive << mesh.joint_remaps;
     _archive << mesh.inverse_bind_poses;
+    _archive << mesh.materials;
   }
 }
 
@@ -89,6 +113,7 @@ void Extern<sample::Mesh>::Load(IArchive& _archive, sample::Mesh* _meshes,
     _archive >> mesh.triangle_indices;
     _archive >> mesh.joint_remaps;
     _archive >> mesh.inverse_bind_poses;
+    _archive >> mesh.materials;
   }
 }
 }  // namespace io
