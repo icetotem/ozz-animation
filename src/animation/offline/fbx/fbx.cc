@@ -152,6 +152,7 @@ void FbxSceneLoader::ImportScene(FbxImporter* _importer,
     // Setup axis and system converter.
     if (imported) {
       FbxGlobalSettings& settings = scene_->GetGlobalSettings();
+      settings.SetAxisSystem(FbxAxisSystem::DirectX);
       converter_ = New<FbxSystemConverter>(settings.GetAxisSystem(),
                                            settings.GetSystemUnit());
     }

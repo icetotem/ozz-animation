@@ -373,10 +373,37 @@ bool BuildVertices(FbxMesh* _fbx_mesh,
     }
   }
 
+  ozz::map<int, ozz::vector<int>> mat_bundles;
+  int materialCount = _fbx_mesh->GetElementMaterialCount();
+  for (int i = 0; i < materialCount; ++i) {
+    FbxGeometryElementMaterial* materialElement =
+        _fbx_mesh->GetElementMaterial(i);
+    FbxGeometryElement::EMappingMode mappingMode =
+        materialElement->GetMappingMode();
+    FbxGeometryElement::EReferenceMode referenceMode =
+        materialElement->GetReferenceMode();
+
+    if (mappingMode == FbxGeometryElement::eByPolygon 
+        && referenceMode == FbxGeometryElement::eIndexToDirect) {
+      for (int polygonIndex = 0; polygonIndex < _fbx_mesh->GetPolygonCount(); polygonIndex++) {
+        int materialIndex = materialElement->GetIndexArray().GetAt(polygonIndex);
+        mat_bundles[materialIndex].push_back(polygonIndex);
+      }
+    }
+  }
+
   // Sorts triangle indices to optimize vertex cache.
   std::qsort(array_begin(_output_mesh->triangle_indices),
              _output_mesh->triangle_indices.size() / 3, sizeof(uint16_t) * 3,
              &SortTriangles);
+
+  for (auto iter : mat_bundles) {
+    ozz::sample::Mesh::MaterialSlot slot;
+    slot.id = iter.first;
+    slot.start_index = iter.second.front() * 3;
+    slot.num_indices = static_cast<uint32_t>(iter.second.size() * 3);
+    _output_mesh->materials.push_back(slot);
+  }
 
   return true;
 }
@@ -858,6 +885,7 @@ bool SplitParts(const ozz::sample::Mesh& _skinned_mesh,
   // Copy bind pose matrices
   _partitionned_mesh->inverse_bind_poses = _skinned_mesh.inverse_bind_poses;
   _partitionned_mesh->joint_remaps = _skinned_mesh.joint_remaps;
+  _partitionned_mesh->materials = _skinned_mesh.materials;
 
   return true;
 }
