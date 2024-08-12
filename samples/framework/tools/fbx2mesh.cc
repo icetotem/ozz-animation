@@ -45,7 +45,7 @@
 OZZ_OPTIONS_DECLARE_STRING(file, "Specifies input file.", "", true)
 OZZ_OPTIONS_DECLARE_STRING(skeleton,
                            "Specifies the skeleton that the skin is bound to.",
-                           "", true)
+                           "", false)
 OZZ_OPTIONS_DECLARE_STRING(mesh, "Specifies ozz mesh output file.", "", true)
 OZZ_OPTIONS_DECLARE_BOOL(split,
                          "Split the skinned mesh into parts (number of joint "
@@ -929,6 +929,7 @@ int main(int _argc, const char** _argv) {
 
   // Opens skeleton file.
   ozz::animation::Skeleton skeleton;
+  if (strcmp(OPTIONS_skeleton.value(), "") != 0)
   {
     ozz::log::Out() << "Loading skeleton archive " << OPTIONS_skeleton.value()
                     << "." << std::endl;
